@@ -1,0 +1,19 @@
+{
+    "name": "heximcz/api-wrapper-webglobe",
+    "description": "PHP wrapper for Webglobe REST API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lubomír Špaček",
+            "homepage": "https://hexim.cz"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Webglobe\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.6"
+    }
+}
