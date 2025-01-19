@@ -1,5 +1,11 @@
 # PHP Wrapper for <https://api.webglobe.com/>
 
+## Install
+
+```bash
+composer require heximcz/api-wrapper-webglobe
+```
+
 ## Examples
 
 ### GET domain info by name
