@@ -484,7 +484,8 @@ class ApiWebglobe
     {
         $this->checkTokenExpiration();
         $payload = $this->addFormName($payload);
-        $url = "{$this->api_url}{$endpoint}" . (!empty($payload) ? '?' . http_build_query($payload) : '');
+        $separator = (strpos($endpoint, '?') !== false) ? '&' : '?';
+        $url = "{$this->api_url}{$endpoint}" . (!empty($payload) ? $separator . http_build_query($payload) : '');
         $this->sendRequest($url, $payload, "GET");
     }
 
@@ -547,8 +548,15 @@ class ApiWebglobe
         $this->error_code = null;
         $this->response = [];
 
+        $ch = false;
+
         try {
             $ch = curl_init($url);
+
+            if ($ch === false) {
+                throw new ApiWebglobeException("ApiWebglobe: Failed to initialize cURL for URL: {$url}");
+            }
+
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
@@ -562,16 +570,16 @@ class ApiWebglobe
                 $headers[] = "Authorization: Bearer {$this->token}";
             }
 
-            if (in_array($methode, ["POST", "PUT", "DELETE"])) {
+            if (\in_array($methode, ["POST", "PUT", "DELETE"])) {
                 if ($methode === "POST") {
                     curl_setopt($ch, CURLOPT_POST, true);
                 }
-                if (in_array($methode, ["PUT", "DELETE"])) {
+                if (\in_array($methode, ["PUT", "DELETE"])) {
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $methode);
                 }
                 $json_data = !empty($payload) ? json_encode($payload) : "{}";
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
-                $headers[] = "Content-Length: " . strlen($json_data);
+                $headers[] = "Content-Length: " . \strlen($json_data);
             }
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -596,7 +604,9 @@ class ApiWebglobe
                 throw new ApiWebglobeResponseException("ApiWebglobe: API Error ({$this->return_code}): {$this->getError()}");
             }
         } finally {
-            curl_close($ch);
+            if ($ch !== null && $ch !== false) {
+                curl_close($ch);
+            }
         }
     }
 
@@ -607,7 +617,7 @@ class ApiWebglobe
      */
     private function addFormName($payload = [])
     {
-        if (array_key_exists("form_name", $this->auth_data)) {
+        if (\array_key_exists("form_name", $this->auth_data)) {
             $payload["form_name"] = $this->auth_data["form_name"];
         }
         return $payload;
@@ -659,7 +669,7 @@ class ApiWebglobe
     private function getArrayValue($array, $keys)
     {
         foreach ($keys as $key) {
-            if (is_array($array) && array_key_exists($key, $array)) {
+            if (\is_array($array) && \array_key_exists($key, $array)) {
                 $array = $array[$key];
             } else {
                 return null;
